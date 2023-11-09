@@ -71,11 +71,11 @@ func findDataFromOthers(key string) (interface{}, error) {
 	c1 := make(chan rpcRes)
 	c2 := make(chan rpcRes)
 	go func() {
-		data, err := grpcGetData(ServerName1, key)
+		data, err := grpcGetData(conn1, key)
 		c1 <- rpcRes{value: data, err: err}
 	}()
 	go func() {
-		data, err := grpcGetData(ServerName2, key)
+		data, err := grpcGetData(conn2, key)
 		c2 <- rpcRes{value: data, err: err}
 	}()
 	for i := 0; i < 2; i++ {
@@ -97,10 +97,10 @@ func deleteDataFromOthers(key string) error {
 	c2 := make(chan error)
 	var err error
 	go func() {
-		c1 <- grpcDeleteData(ServerName1, key)
+		c1 <- grpcDeleteData(conn1, key)
 	}()
 	go func() {
-		c2 <- grpcDeleteData(ServerName2, key)
+		c2 <- grpcDeleteData(conn2, key)
 	}()
 	for i := 0; i < 2; i++ {
 		select {
@@ -121,10 +121,10 @@ func updateDataFromOthers(key string, value interface{}) error {
 	c2 := make(chan error)
 	var err error
 	go func() {
-		c1 <- grpcUpdateData(ServerName1, key, value)
+		c1 <- grpcUpdateData(conn1, key, value)
 	}()
 	go func() {
-		c2 <- grpcUpdateData(ServerName2, key, value)
+		c2 <- grpcUpdateData(conn2, key, value)
 	}()
 	for i := 0; i < 2; i++ {
 		select {
