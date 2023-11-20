@@ -16,21 +16,9 @@ import (
 type RpcServer struct {
 	*pb.UnimplementedSDSCServer
 }
-type MyData struct {
-	Value interface{}
-}
 
 func (s *RpcServer) GetData(c context.Context, req *pb.Req) (*pb.Res, error) {
 	if _, flag := Data[req.Key]; flag {
-		//myData := &MyData{
-		//	Value: Data[req.Key],
-		//}
-		//buf := new(bytes.Buffer)
-		////gob编码
-		//enc := gob.NewEncoder(buf)
-		//if err := enc.Encode(myData); err != nil {
-		//	log.Println(err)
-		//}
 		value, err := json.Marshal(Data[req.Key])
 		if err != nil {
 			log.Println(err)
@@ -38,7 +26,6 @@ func (s *RpcServer) GetData(c context.Context, req *pb.Req) (*pb.Res, error) {
 		}
 		myDataMessage := &pb.Res{
 			Value: &anypb.Any{
-				//TypeUrl: "type.googleapis.com/server.MyData",
 				Value: value, // 序列化为字节流
 			},
 		}
@@ -60,15 +47,7 @@ func (s *RpcServer) UpdateData(c context.Context, req *pb.ReqUpdate) (*emptypb.E
 			return &emptypb.Empty{}, err
 		}
 
-		//buf := new(bytes.Buffer)
-		//buf.Write(datas)
-		//dec := gob.NewDecoder(buf)
-		//var info *MyData
-		//if err := dec.Decode(&info); err != nil {
-		//	log.Println(err)
-		//}
 		//存在数据则更新
-
 		Data[req.Key] = value
 		return &emptypb.Empty{}, nil
 	} else {

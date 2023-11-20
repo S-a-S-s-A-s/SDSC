@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"log"
 )
 
 type rpcRes struct {
@@ -16,6 +15,7 @@ func InitRouter(r *gin.Engine) {
 	r.DELETE("/:key", deleteData)
 }
 
+// 删除数据
 func deleteData(c *gin.Context) {
 	var key = c.Param("key")
 	if _, flag := Data[key]; flag {
@@ -41,11 +41,15 @@ func updateData(c *gin.Context) {
 		c.JSON(400, "get json error")
 	}
 	for key, value := range jsonData {
+		//判断本地是否存在
+		if _, flag := Data[key]; flag {
+			//存在则更新
+			Data[key] = value
+			continue
+		}
 		//询问其他主机是否存在该数据
 		err := updateDataFromOthers(key, value)
 		if err != nil {
-			//输出错误
-			log.Println(err)
 			//没有则存在本地
 			Data[key] = value
 		}
